@@ -11,7 +11,7 @@
 #include <sachen/model.h>
 #include <sachen/filesystem.h>
 #define STB_IMAGE_IMPLEMENTATION    //WICHTIG NCIHT WEG MCAHEN KRISSE VIERTEN GRADES
-#include <stb/stb_image.h>          //WICHTIG NICHT REIEHNFOLGE 'ÄNDERN
+#include <stb/stb_image.h>          //WICHTIG NICHT REIEHNFOLGE 'Ã„NDERN
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -46,7 +46,7 @@ int main()
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
-    }
+}
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, get_mouse);
@@ -60,33 +60,23 @@ int main()
         return -1;
     }
     stbi_set_flip_vertically_on_load(true);
+   
 
-    glEnable(GL_DEPTH_TEST);
 
     Shader shader_e("deps/include/shader/vertexshader.vs", "deps/include/shader/fragmentshader.fs");
-    Model testmodel(("dateien/wege/test11.obj"));
-    //glEnable(GL_DEPTH_TEST);
+    Model testmodel(("dateien/backpack.fbx"));
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
-    {
+    {        
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         processInput(window);
-
+        
         // render
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader_e.use();
-        shader_e.setVec3("light.direction", -1.0f, -0.5f, -0.0f);
-        shader_e.setVec3("viewPos", camera.Position);
-
-        // light properties
-        shader_e.setVec3("light.ambient", 0.4f, 0.2f, 0.7f);
-        shader_e.setVec3("light.diffuse", 0.7f, 0.7f, 0.7f);
-        shader_e.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-        // material properties
-        shader_e.setFloat("material.shininess", 16.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -123,7 +113,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         camera.ProcessKeyboard(LEFT, deltaTime);
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
         camera.ProcessKeyboard(RIGHT, deltaTime);
     }
 }
