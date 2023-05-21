@@ -9,10 +9,13 @@
 #include <shader/shader_m.h>
 #include <sachen/camera.h>
 #include <sachen/model.h>
+#include <sachen/wegclass.h>
 #include <sachen/filesystem.h>
 #define STB_IMAGE_IMPLEMENTATION    //WICHTIG NCIHT WEG MCAHEN KRISSE VIERTEN GRADES
 #include <stb/stb_image.h>          //WICHTIG NICHT REIEHNFOLGE 'ÄNDERN
 #include <iostream>
+#include <vector>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void get_mouse(GLFWwindow* window, double xpos, double ypos);
@@ -62,9 +65,20 @@ int main()
     stbi_set_flip_vertically_on_load(true);
 
     glEnable(GL_DEPTH_TEST);
-
     Shader shader_e("deps/include/shader/vertexshader.vs", "deps/include/shader/fragmentshader.fs");
-    Model testmodel(("dateien/wege/test11.obj"));
+
+
+    Model model0(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"));
+    Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(30.0f, 0.0f, 0.0f), ("dateien/wege/weg1.obj"));
+    Model model2(glm::vec3(0.0f, -24.6f, 0.0f), glm::vec3(60.83f, 2.16f, 0.0f),("dateien/wege/weg2.obj"));
+    vector<Model> modelvec;
+    modelvec.push_back(model1);
+    modelvec.push_back(model2);
+    vector<Model> currentwege;
+    currentwege.push_back(model0);
+    currentwege.push_back(model1);
+    currentwege.push_back(model2);
+    currentwege.push_back(model2);
     //glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
@@ -77,15 +91,14 @@ int main()
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader_e.use();
+        //lichteinstellungen
         shader_e.setVec3("light.direction", -1.0f, -0.5f, -0.0f);
         shader_e.setVec3("viewPos", camera.Position);
 
-        // light properties
         shader_e.setVec3("light.ambient", 0.4f, 0.2f, 0.7f);
         shader_e.setVec3("light.diffuse", 0.7f, 0.7f, 0.7f);
         shader_e.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-        // material properties
         shader_e.setFloat("material.shininess", 16.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -93,13 +106,18 @@ int main()
         shader_e.setMat4("projection", projection);
         shader_e.setMat4("view", view);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	// it's a bit too big for our scene, so scale it down
-        shader_e.setMat4("model", model);
-        testmodel.Draw(shader_e);
-
-
+        for (int i = 1; i < currentwege.size(); i++){
+            Model testmodel = currentwege[i];
+            glm::mat4 model = glm::mat4(1.0f);
+            shader_e.setMat4("model", model);
+            model = glm::translate(model, currentwege[i-1].newPos);
+            model = glm::rotate(model, glm::radians(currentwege[i - 1].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(currentwege[i - 1].rotation.z), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(currentwege[i - 1].rotation.y), glm::vec3(0.0f, 0.0f, 1.0f));
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	
+            shader_e.setMat4("model", model);
+            testmodel.Draw(shader_e); 
+        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -115,16 +133,16 @@ void processInput(GLFWwindow* window)
 
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        camera.ProcessKeyboard(FORWARD, deltaTime * 3);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        camera.ProcessKeyboard(BACKWARD, deltaTime * 3);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        camera.ProcessKeyboard(LEFT, deltaTime * 3);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        camera.ProcessKeyboard(RIGHT, deltaTime * 3);
     }
 }
 

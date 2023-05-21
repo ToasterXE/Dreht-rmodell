@@ -31,10 +31,13 @@ public:
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
-
+    glm::vec3 rotation;
+    glm::vec3 newPos;
     // constructor, expects a filepath to a 3D model.
-    Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+    Model(glm::vec3 rot,glm::vec3 pos, string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
+        rotation = rot;
+        newPos = pos;
         loadModel(path);
     }
 
