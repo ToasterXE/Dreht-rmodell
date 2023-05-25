@@ -35,7 +35,7 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-glm::vec3 lightPos(20.2f, 10.0f, 10.0f);
+glm::vec3 lightPos(15.2f, 8.0f, 25.0f);
 
 int main()
 {
@@ -159,13 +159,13 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     
-    int würfelNum = 10;
+    int würfelNum = 20;
     vector<modelData> würfeldaten;
     vector<glm::vec3> positionen;
 
     for (int c = 0; c < würfelNum; c++) {
         glm::vec3 color((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX));
-        glm::vec3 pos((float)(rand()%50 + 20), (float)(rand()%40-20), (float)(rand()%50));
+        glm::vec3 pos(camera.Position.x + (float)(rand()%50), (float)(rand()%40-30), camera.Position.z + (float)(rand()%50 + 30));
 
         modelData modeldata(100.0f, pos, 3.0f, color);
         würfeldaten.push_back(modeldata);
@@ -190,9 +190,16 @@ int main()
         würfelshader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         würfelshader.setVec3("lightPos", lightPos);
         würfelshader.setVec3("viewPos", camera.Position);
-
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 ranmat(1.0f);
+        glm::vec4 transcoords = glm::vec4((currentwege[1].newPos.x, currentwege[1].newPos.y, currentwege[1].newPos.z, 1.0f));
+        ranmat *= glm::rotate(ranmat, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));            
+        ranmat = glm::rotate(ranmat, glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        ranmat = glm::rotate(ranmat, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        ranmat = glm::translate(ranmat, currentwege[1].newPos);
+        glm::vec4 transecoords = ranmat * transcoords;
+        glm::mat4 view = camera.GetViewMatrix(glm::vec3(transecoords.x, transecoords.y, transecoords.z));
+        std::cout << transecoords.x << "\n";
         würfelshader.setMat4("projection", projection);
         würfelshader.setMat4("view", view);
 
