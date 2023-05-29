@@ -18,8 +18,9 @@
 #include <vector>
 #include <time.h>
 
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void get_mouse(GLFWwindow* window, double xpos, double ypos);
+//void get_mouse(GLFWwindow* window, double xpos, double ypos);
 void get_scroll(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
@@ -54,7 +55,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, get_mouse);
+    //glfwSetCursorPosCallback(window, get_mouse);
     glfwSetScrollCallback(window, get_scroll);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -75,17 +76,20 @@ int main()
     glm::vec3 ingsesamtpos = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 insgesamtrot = glm::vec3(0.0f, 0.0f, 0.0f);
     std::cout<<"lade modelle\n";
-    Model model0(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"));
-    Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(30.0f, 0.0f, 0.0f), ("dateien/wege/weg1.obj"));
-    Model model2(glm::vec3(0.0f, 0.0f, -24.6f), glm::vec3(60.83f, 2.16f, 0.0f),("dateien/wege/weg2.obj"));
-    Model model3(glm::vec3(0.0f, -28.1f, 0.0f), glm::vec3(60.0f, 0.0f, 7.1f), ("dateien/wege/weg3.obj"));
-    Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/weg4.obj"));
-    Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/weg5.obj"));
+    Model autoModel(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"), ("dateien/wege/auto.obj"));
+    Model model0(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"), ("keinpfad"));
+    Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg1.obj"));
+    Model model2(glm::vec3(0.0f, 0.0f, -24.6f), glm::vec3(60.83f, 2.16f, 0.0f), ("dateien/wege/animation/weg2anim.txt"), ("dateien/wege/weg2.obj"));
+    Model model3(glm::vec3(0.0f, -28.1f, 0.0f), glm::vec3(60.0f, 0.0f, 7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg3.obj"));
+    Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
+    Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
     vector<Model> modelvec{ model1, model2, model3, model4, model5 };
 
-    vector<Model> currentwege{model0, model1, model2, model3, model4};
+    vector<Model> currentwege{model0, model1, model2, model1, model4};
 
-    int wegeTime = 3;
+    int wegeTime = 5;
+    float animTime = 0.1;
+    int currentAnimC = 0;
     int counter = 0;
     glm::vec3 globalrot(0.0f, 0.0f, 0.0f);
     glm::vec3 globalpos(0.0f, 0.0f, 0.0f);
@@ -171,6 +175,9 @@ int main()
         würfeldaten.push_back(modeldata);
     }
 
+    glm::vec3 current_lookat;
+    glm::vec3 current_cPos;
+    glm::mat4 current_autoPos;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -190,7 +197,7 @@ int main()
         würfelshader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         würfelshader.setVec3("lightPos", lightPos);
         würfelshader.setVec3("viewPos", camera.Position);
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
         glm::mat4 ranmat(1.0f);
         glm::vec4 transcoords = glm::vec4((currentwege[1].newPos.x, currentwege[1].newPos.y, currentwege[1].newPos.z, 1.0f));
         ranmat *= glm::rotate(ranmat, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));            
@@ -198,8 +205,9 @@ int main()
         ranmat = glm::rotate(ranmat, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
         ranmat = glm::translate(ranmat, currentwege[1].newPos);
         glm::vec4 transecoords = ranmat * transcoords;
-        glm::mat4 view = camera.GetViewMatrix(glm::vec3(transecoords.x, transecoords.y, transecoords.z));
-        std::cout << transecoords.x << "\n";
+        //glm::mat4 view = camera.GetViewMatrix(glm::vec3(currentwege[1].aMatrices[currentAnimC][3][0], currentwege[1].aMatrices[currentAnimC][3][1], currentwege[1].aMatrices[currentAnimC][3][2]));
+        glm::mat4 view = camera.GetViewMatrix(currentwege[1].aCposi[currentAnimC], glm::vec3(currentwege[1].aMatrices[currentAnimC][3][0], currentwege[1].aMatrices[currentAnimC][3][1], currentwege[1].aMatrices[currentAnimC][3][2]));
+        //std::cout << transecoords.x << "\n";
         würfelshader.setMat4("projection", projection);
         würfelshader.setMat4("view", view);
 
@@ -219,10 +227,11 @@ int main()
             würfelmodel = glm::scale(würfelmodel, glm::vec3(würfeldaten[i].scale));
             würfelmodel = glm::rotate(würfelmodel, glm::radians(float(glfwGetTime() * würfeldaten[i].rotSpeed)), glm::vec3(1.0f, 1.0f, 1.0f));
             würfelshader.setMat4("model", würfelmodel);
-
+            //std::cout << würfelmodel[0][0] << "  " << würfelmodel[0][1] << "  " << würfelmodel[0][2] << "  " << würfelmodel[0][3] << "\n";
             // render the cube
             glBindVertexArray(cubeVAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
+
         }
 
         //--lichtwürfel--
@@ -278,13 +287,32 @@ int main()
             modelShader.setMat4("model", model);
             testmodel.Draw(modelShader); 
         }
-        if (int(glfwGetTime() / wegeTime) > counter) {
+        //glm::mat4 model = glm::mat4(1.0f);
+        //model = glm::translate(model, glm::vec3(60.0f, 0.0f, 0.0f));
+        //glm::mat4 model = glm::mat4(1.0f);
+        currentAnimC++;
+        if (currentAnimC == 100) {
             counter++;
+            currentAnimC = 0;
             globalpos += currentwege[1].newPos;
             globalrot += currentwege[1].rotation;
             currentwege.erase(currentwege.begin() + 1);
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
         }
+        current_autoPos = currentwege[1].aMatrices[currentAnimC];
+        glm::mat4 model = current_autoPos;
+        //model[0][3] = currentwege[1].aMatrices[80][0][3];
+        /*cout << view[0][0] << "  " << view[0][1] << "  " << view[0][2] << "  " << view[0][3] << "\n";
+        cout << view[1][0] << "  " << view[1][1] << "  " << view[1][2] << "  " << view[1][3] << "\n";
+        cout << view[2][0] << "  " << view[2][1] << "  " << view[2][2] << "  " << view[2][3] << "\n";
+        cout << view[3][0] << "  " << view[3][1] << "  " << view[3][2] << "  " << view[3][3] << "\n";
+        cout << "\n";
+        */
+        //cout << 2 + model[0][3]<<"\n";
+
+        modelShader.setMat4("model", model);
+        autoModel.Draw(modelShader);
+
         //std::cout << glfwGetTime() <<"\n";
 
         glfwSwapBuffers(window);
@@ -325,7 +353,7 @@ void get_scroll(GLFWwindow* window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-void get_mouse(GLFWwindow* window, double xposIn, double yposIn)
+/*void get_mouse(GLFWwindow* window, double xposIn, double yposIn)
 {
     int e = 1;
     float xpos = static_cast<float>(xposIn);
@@ -346,4 +374,4 @@ void get_mouse(GLFWwindow* window, double xposIn, double yposIn)
 
     camera.ProcessMouseMovement(xoffset, yoffset);
   
-    }
+    }*/

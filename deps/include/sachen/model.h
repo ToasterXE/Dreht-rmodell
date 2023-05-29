@@ -12,7 +12,6 @@
 
 #include <sachen/mesh.h>
 #include <sachen/shader.h>
-
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -20,7 +19,6 @@
 #include <map>
 #include <vector>
 using namespace std;
-
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
 
 class Model 
@@ -33,11 +31,14 @@ public:
     bool gammaCorrection;
     glm::vec3 rotation;
     glm::vec3 newPos;
+    vector<glm::mat4> aMatrices;
+    vector<glm::vec3> aCposi;
     // constructor, expects a filepath to a 3D model.
-    Model(glm::vec3 rot,glm::vec3 pos, string const &path, bool gamma = false) : gammaCorrection(gamma)
+    Model(glm::vec3 rot,glm::vec3 pos, string const &aFilePath, string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
         rotation = rot;
         newPos = pos;
+        getAnim(aFilePath);
         loadModel(path);
     }
 
@@ -49,6 +50,49 @@ public:
     }
     
 private:
+    void getAnim(string const &aFilePath){
+        ifstream datei;
+        int len;
+        datei.open(aFilePath);
+        if (!datei){
+            cout<<"eee";
+        }
+        datei>>len;
+        cout<<len<<"\n";
+        float x;
+        for (int i = 0; i <len/16;i++){
+            glm::mat4 newMat;
+            for (int zeile = 0; zeile < 4; zeile++){
+                for (int spalte = 0; spalte < 4; spalte++){
+                    datei>>x;
+                    newMat[spalte][zeile] = (float)x;   //muss umgedreht sein wegen sachen
+                }
+            }
+            aMatrices.push_back(newMat);
+        }
+        for (int i = 0; i<len/16; i++){
+            glm::vec3 newPos;
+            for (int zeile = 0; zeile < 4; zeile++){
+                for (int spalte = 0; spalte < 4; spalte++){
+                    datei>>x;
+                    if (spalte == 3 and zeile < 3){
+                        newPos[zeile] = x;
+                    }
+                }
+        
+            }
+            aCposi.push_back(newPos);
+
+        }
+        /*for (int e = 0; e <aMatrices.size(); e++){
+            cout<<aMatrices[e][0][0]<<"  "<<aMatrices[e][0][1]<<"  "<<aMatrices[e][0][2]<<"  "<<aMatrices[e][0][3]<<"\n";
+            cout<<aMatrices[e][1][0]<<"  "<<aMatrices[e][1][1]<<"  "<<aMatrices[e][1][2]<<"  "<<aMatrices[e][1][3]<<"\n";
+            cout<<aMatrices[e][2][0]<<"  "<<aMatrices[e][2][1]<<"  "<<aMatrices[e][2][2]<<"  "<<aMatrices[e][2][3]<<"\n";
+            cout<<aMatrices[e][3][0]<<"  "<<aMatrices[e][3][1]<<"  "<<aMatrices[e][3][2]<<"  "<<aMatrices[e][3][3]<<"\n";   
+            cout<<"\n";
+        }        */
+    }
+
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path)
     {
