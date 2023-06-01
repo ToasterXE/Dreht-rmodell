@@ -1,0 +1,9 @@
+#count
+#acube -mitte
+#ccube -kamera
+#rcube -rechts
+#lcube -links
+
+blender export:
+up: y
+forward: -z
