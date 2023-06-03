@@ -32,6 +32,8 @@ public:
     glm::vec3 rotation;
     glm::vec3 newPos;
     vector<glm::mat4> aMatrices;
+    vector<glm::mat4> rMatrices;
+    vector<glm::mat4> lMatrices;
     vector<glm::vec3> aCposi;
     // constructor, expects a filepath to a 3D model.
     Model(glm::vec3 rot,glm::vec3 pos, string const &aFilePath, string const &path, bool gamma = false) : gammaCorrection(gamma)
@@ -82,7 +84,28 @@ private:
         
             }
             aCposi.push_back(newPos);
-
+        }
+        float y;
+        for (int i = 0; i <len/16;i++){
+            glm::mat4 newMat;
+            for (int zeile = 0; zeile < 4; zeile++){
+                for (int spalte = 0; spalte < 4; spalte++){
+                    datei>>y;
+                    newMat[spalte][zeile] = (float)y;   //muss umgedreht sein wegen sachen
+                }
+            }
+            rMatrices.push_back(newMat);
+        }
+        float z;
+        for (int i = 0; i <len/16;i++){
+            glm::mat4 newMat;
+            for (int zeile = 0; zeile < 4; zeile++){
+                for (int spalte = 0; spalte < 4; spalte++){
+                    datei>>z;
+                    newMat[spalte][zeile] = (float)z;   //muss umgedreht sein wegen sachen
+                }
+            }
+            lMatrices.push_back(newMat);
         }
         /*for (int e = 0; e <aMatrices.size(); e++){
             cout<<aMatrices[e][0][0]<<"  "<<aMatrices[e][0][1]<<"  "<<aMatrices[e][0][2]<<"  "<<aMatrices[e][0][3]<<"\n";

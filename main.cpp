@@ -178,7 +178,7 @@ int main()
     glm::vec3 current_lookat;
     glm::vec3 current_cPos;
     glm::mat4 current_autoPos;
-
+    glm::vec4 originP(0.0f,0.0f,0.0f,1.0f);
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -198,13 +198,14 @@ int main()
         würfelshader.setVec3("lightPos", lightPos);
         würfelshader.setVec3("viewPos", camera.Position);
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-        glm::mat4 ranmat(1.0f);
+        glm::mat4 globalrotmat(1.0f);
         glm::vec4 transcoords = glm::vec4((currentwege[1].newPos.x, currentwege[1].newPos.y, currentwege[1].newPos.z, 1.0f));
-        ranmat *= glm::rotate(ranmat, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));            
-        ranmat = glm::rotate(ranmat, glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        ranmat = glm::rotate(ranmat, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
-        ranmat = glm::translate(ranmat, currentwege[1].newPos);
-        glm::vec4 transecoords = ranmat * transcoords;
+        globalrotmat *= glm::rotate(globalrotmat, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));            
+        globalrotmat = glm::rotate(globalrotmat, glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        globalrotmat = glm::rotate(globalrotmat, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 transmate = globalrotmat;
+        transmate = glm::translate(globalrotmat, currentwege[1].newPos);
+        glm::vec4 transecoords = transmate * transcoords;
         //glm::mat4 view = camera.GetViewMatrix(glm::vec3(currentwege[1].aMatrices[currentAnimC][3][0], currentwege[1].aMatrices[currentAnimC][3][1], currentwege[1].aMatrices[currentAnimC][3][2]));
         glm::mat4 view = camera.GetViewMatrix(currentwege[1].aCposi[currentAnimC], glm::vec3(currentwege[1].aMatrices[currentAnimC][3][0], currentwege[1].aMatrices[currentAnimC][3][1], currentwege[1].aMatrices[currentAnimC][3][2]));
         //std::cout << transecoords.x << "\n";
@@ -298,8 +299,28 @@ int main()
             globalrot += currentwege[1].rotation;
             currentwege.erase(currentwege.begin() + 1);
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
+
         }
         current_autoPos = currentwege[1].aMatrices[currentAnimC];
+        glm::mat4 rote(1.0f);
+        rote *= glm::rotate(rote, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        rote = glm::rotate(rote, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        rote = glm::rotate(rote, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        cout << globalrot.x << " " << globalrot.y << " " << globalrot.z << "\n";
+        if (currentAnimC) {
+            glm::vec4 newP = current_autoPos[3];
+            glm::vec4 oldP = currentwege[1].aMatrices[currentAnimC - 1][3];
+            glm::vec4 dist = newP - oldP;
+            glm::vec4 print;
+            glm::vec4 dist_rotate = dist * rote;
+            originP += dist_rotate;
+            print = originP;
+            //cout << print[0] << " " << print[1] << " " << print[2] << " " << print[3] << " \n";
+            current_autoPos[3] = originP;
+        }
+        else {
+            originP = current_autoPos[3];
+        }
         glm::mat4 model = current_autoPos;
         //model = glm::translate(model, globalpos);
         model = glm::rotate(model, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
