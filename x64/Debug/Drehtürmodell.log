@@ -2,5 +2,4 @@
 C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(74,15): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
 C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(91,25): warning C4305: "Initialisierung": Verkürzung von "double" in "float"
 C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(178,15): warning C4101: "current_lookat": Unreferenzierte lokale Variable
-C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(179,15): warning C4101: "current_cPos": Unreferenzierte lokale Variable
   Drehtürmodell.vcxproj -> C:\Users\mrnon\source\repos\Drehtürmodell\x64\Debug\Drehtürmodell.exe

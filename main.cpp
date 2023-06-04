@@ -80,12 +80,12 @@ int main()
     Model model0(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"), ("keinpfad"));
     Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg1.obj"));
     Model model2(glm::vec3(0.0f, -17.1f, 0.0f), glm::vec3(59.621f, 0.0f, 2.0116f), ("dateien/wege/animation/weg2anim.txt"), ("dateien/wege/weg2.obj"));
-    Model model3(glm::vec3(0.0f, -28.1f, 0.0f), glm::vec3(60.0f, 0.0f, 7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg3.obj"));
-    Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
-    Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model2, model3, model4, model5 };
+    //Model model3(glm::vec3(0.0f, -28.1f, 0.0f), glm::vec3(60.0f, 0.0f, 7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg3.obj"));
+    //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
+    //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
+    vector<Model> modelvec{ model1, model2, /*model3, model4, model5*/};
 
-    vector<Model> currentwege{model0, model1, model2, model1, model4};
+    vector<Model> currentwege{model0, model1, model2, model1,/* model4*/};
 
     int wegeTime = 5;
     float animTime = 0.1;
@@ -176,9 +176,11 @@ int main()
     }
 
     glm::vec3 current_lookat;
-    glm::vec3 current_cPos;
+    glm::vec3 current_cPos(0.0f,0.0f,0.0f);
     glm::mat4 current_autoPos;
     glm::vec4 originP(0.0f,0.0f,0.0f,1.0f);
+    glm::vec3 origincP(1.0f, 1.0f, 1.0f);
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -191,11 +193,10 @@ int main()
         globalrotmat = glm::rotate(globalrotmat, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
         glm::mat4 globalreverserotmat(1.0f);
-        globalreverserotmat *= glm::rotate(globalreverserotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        glm::mat4 view = camera.GetViewMatrix(currentwege[1].aCposi[currentAnimC], glm::vec3(currentwege[1].aMatrices[currentAnimC][3][0], currentwege[1].aMatrices[currentAnimC][3][1], currentwege[1].aMatrices[currentAnimC][3][2]));
+
+
+        glm::mat4 view = camera.GetViewMatrix(current_cPos, originP);
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
         processInput(window);
@@ -295,8 +296,14 @@ int main()
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
 
         }
+        globalreverserotmat *= glm::rotate(globalreverserotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
         current_autoPos = currentwege[1].aMatrices[currentAnimC];
+        current_cPos = currentwege[1].aCposi[currentAnimC];
+
+
 
         if (currentAnimC) {
             glm::vec4 newP = current_autoPos[3];
@@ -306,10 +313,21 @@ int main()
 
             originP += dist_rotate;
             current_autoPos[3] = originP;
+
+            glm::vec3 newcP = current_cPos;
+            glm::vec3 oldcP = currentwege[1].aCposi[currentAnimC - 1];
+            glm::vec3 dist_c = newcP - oldcP;
+            glm::vec4 dist_rotate_c = glm::vec4(dist_c, 1.0f) * globalreverserotmat;
+            //cout << dist_rotate_ce[0] << " " << dist_rotate_ce[1] << " " << dist_rotate_ce[2] << "\n";
+            origincP += glm::vec3(dist_rotate_c);
+            current_cPos = origincP;
+            //current_cPos = currentwege[1].aCposi[currentAnimC];
+            cout << currentwege[1].aCposi[currentAnimC][0] << " "<< currentwege[1].aCposi[currentAnimC][1] << " " <<currentwege[1].aCposi[currentAnimC][2] << " " << current_cPos[0] << " " << current_cPos[1] << " " << current_cPos[2] << "\n";
         }
 
         else {
             originP = current_autoPos[3];
+            origincP = glm::vec3(glm::vec4(current_cPos, 1.0f)* globalreverserotmat);
         }
 
         glm::mat4 model = current_autoPos;
