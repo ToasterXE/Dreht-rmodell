@@ -286,7 +286,6 @@ int main()
         }
 
 
-        currentAnimC++;
         if (currentAnimC == 100) {
             counter++;
             currentAnimC = 0;
@@ -329,6 +328,7 @@ int main()
             originP = current_autoPos[3];
             origincP = glm::vec3(glm::vec4(current_cPos, 1.0f)* globalreverserotmat);
         }
+        currentAnimC++;
 
         glm::mat4 model = current_autoPos;
         model = glm::rotate(model, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
