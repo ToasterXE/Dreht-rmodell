@@ -35,6 +35,7 @@ public:
     vector<glm::mat4> rMatrices;
     vector<glm::mat4> lMatrices;
     vector<glm::vec3> aCposi;
+    vector<vector<glm::mat4>> matrices;
     // constructor, expects a filepath to a 3D model.
     Model(glm::vec3 rot,glm::vec3 pos, string const &aFilePath, string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
@@ -107,6 +108,7 @@ private:
             }
             lMatrices.push_back(newMat);
         }
+        matrices = {lMatrices,aMatrices,rMatrices};
         /*for (int e = 0; e <aMatrices.size(); e++){
             cout<<aMatrices[e][0][0]<<"  "<<aMatrices[e][0][1]<<"  "<<aMatrices[e][0][2]<<"  "<<aMatrices[e][0][3]<<"\n";
             cout<<aMatrices[e][1][0]<<"  "<<aMatrices[e][1][1]<<"  "<<aMatrices[e][1][2]<<"  "<<aMatrices[e][1][3]<<"\n";

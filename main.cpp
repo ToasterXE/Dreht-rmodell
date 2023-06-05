@@ -37,6 +37,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 glm::vec3 lightPos(15.2f, 8.0f, 25.0f);
+int spur = 1;
+
 
 int main()
 {
@@ -299,20 +301,26 @@ int main()
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        current_autoPos = currentwege[1].aMatrices[currentAnimC];
+        current_autoPos = currentwege[1].matrices[spur][currentAnimC];
         current_cPos = currentwege[1].aCposi[currentAnimC];
 
 
 
         if (currentAnimC) {
+            originP = currentwege[1].matrices[spur][0][3];
             glm::vec4 newP = current_autoPos[3];
-            glm::vec4 oldP = currentwege[1].aMatrices[currentAnimC - 1][3];
+            glm::vec4 dist = newP - originP;
+            glm::vec4 dist_rotate = dist * globalreverserotmat;
+            originP += dist_rotate;
+            current_autoPos[3] = originP;
+            /*glm::vec4 newP = current_autoPos[3];
+            glm::vec4 oldP = currentwege[1].matrices[spur][currentAnimC - 1][3];
             glm::vec4 dist = newP - oldP;
             glm::vec4 dist_rotate = dist * globalreverserotmat;
 
             originP += dist_rotate;
             current_autoPos[3] = originP;
-
+            */
             glm::vec3 newcP = current_cPos;
             glm::vec3 oldcP = currentwege[1].aCposi[currentAnimC - 1];
             glm::vec3 dist_c = newcP - oldcP;
@@ -321,19 +329,19 @@ int main()
             origincP += glm::vec3(dist_rotate_c);
             current_cPos = origincP;
             //current_cPos = currentwege[1].aCposi[currentAnimC];
-            cout << currentwege[1].aCposi[currentAnimC][0] << " "<< currentwege[1].aCposi[currentAnimC][1] << " " <<currentwege[1].aCposi[currentAnimC][2] << " " << current_cPos[0] << " " << current_cPos[1] << " " << current_cPos[2] << "\n";
+            //cout << currentwege[1].aCposi[currentAnimC][0] << " "<< currentwege[1].aCposi[currentAnimC][1] << " " <<currentwege[1].aCposi[currentAnimC][2] << " " << current_cPos[0] << " " << current_cPos[1] << " " << current_cPos[2] << "\n";
         }
-
+        
         else {
             originP = current_autoPos[3];
             origincP = glm::vec3(glm::vec4(current_cPos, 1.0f)* globalreverserotmat);
         }
         currentAnimC++;
-
+        cout << spur<<"\n";
         glm::mat4 model = current_autoPos;
-        model = glm::rotate(model, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        //model = glm::rotate(model, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        //model = glm::rotate(model, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        //model = glm::rotate(model, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
         modelShader.setMat4("model", model);
         autoModel.Draw(modelShader);
@@ -345,24 +353,34 @@ int main()
     glfwTerminate();
     return 0;
 }
-
+float last = 0.0;
 void processInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    if (glfwGetTime()>last+0.1) {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, true);
+        }
 
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera.ProcessKeyboard(FORWARD, deltaTime * 4);
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera.ProcessKeyboard(BACKWARD, deltaTime * 4);
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera.ProcessKeyboard(LEFT, deltaTime * 4);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera.ProcessKeyboard(RIGHT, deltaTime * 4);
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+                camera.ProcessKeyboard(FORWARD, deltaTime * 4);
+            }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            camera.ProcessKeyboard(BACKWARD, deltaTime * 4);
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            camera.ProcessKeyboard(LEFT, deltaTime * 4);
+            if (spur) {
+                spur -= 1;
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            camera.ProcessKeyboard(RIGHT, deltaTime * 4);
+            if (spur < 2) {
+                spur += 1;
+            }
+        }
+        last = (float)glfwGetTime();
     }
 }
 
