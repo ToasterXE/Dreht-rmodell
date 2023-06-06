@@ -87,7 +87,7 @@ int main()
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
     vector<Model> modelvec{ model1, model2, /*model3, model4, model5*/};
 
-    vector<Model> currentwege{model0, model1, model2, model1,/* model4*/};
+    vector<Model> currentwege{model0, model2, model1, model1,/* model4*/};
 
     int wegeTime = 5;
     float animTime = 0.1;
@@ -179,8 +179,12 @@ int main()
 
     glm::vec3 current_lookat;
     glm::vec3 current_cPos(0.0f,0.0f,0.0f);
-    glm::mat4 current_autoPos;
-    glm::vec4 originP(0.0f,0.0f,0.0f,1.0f);
+    glm::mat4 autoAPos;
+    glm::mat4 autoLPos;
+    glm::mat4 autoRPos;
+    glm::vec4 originA(0.0f,0.0f,0.0f,1.0f);
+    glm::vec4 originL(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 originR(0.0f, 0.0f, 0.0f, 1.0f);
     glm::vec3 origincP(1.0f, 1.0f, 1.0f);
 
     while (!glfwWindowShouldClose(window))
@@ -198,7 +202,7 @@ int main()
 
 
 
-        glm::mat4 view = camera.GetViewMatrix(current_cPos, originP);
+        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA);
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
         processInput(window);
@@ -301,18 +305,38 @@ int main()
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        current_autoPos = currentwege[1].matrices[spur][currentAnimC];
+        autoAPos = currentwege[1].aMatrices[currentAnimC];
+        autoLPos = currentwege[1].lMatrices[currentAnimC];
+        autoRPos = currentwege[1].rMatrices[currentAnimC];
+
         current_cPos = currentwege[1].aCposi[currentAnimC];
 
 
 
         if (currentAnimC) {
-            originP = currentwege[1].matrices[spur][0][3];
-            glm::vec4 newP = current_autoPos[3];
-            glm::vec4 dist = newP - originP;
+            glm::vec4 newP = autoAPos[3];
+            glm::vec4 oldP = currentwege[1].aMatrices[currentAnimC - 1][3];
+            glm::vec4 dist = newP - oldP;
             glm::vec4 dist_rotate = dist * globalreverserotmat;
-            originP += dist_rotate;
-            current_autoPos[3] = originP;
+            originA += dist_rotate;
+            autoAPos[3] = originA;
+
+            //cout << originL[0] << " " << originL[1] << " " << originL[2];
+            //cout <<" "<< originL[0] << " " << originL[1] << " " << originL[2]<< " " << originL[3] << "\n";
+            oldP = currentwege[1].lMatrices[currentAnimC - 1][3];
+            newP = autoLPos[3];
+            dist = newP - oldP;
+            dist_rotate = dist * globalreverserotmat;
+            originL += dist_rotate;
+            autoLPos[3] = originL;
+
+
+            oldP = currentwege[1].rMatrices[currentAnimC - 1][3];
+            newP = autoRPos[3];
+            dist = newP - oldP;
+            dist_rotate = dist * globalreverserotmat;
+            originR += dist_rotate;
+            autoRPos[3] = originR;
             /*glm::vec4 newP = current_autoPos[3];
             glm::vec4 oldP = currentwege[1].matrices[spur][currentAnimC - 1][3];
             glm::vec4 dist = newP - oldP;
@@ -333,12 +357,17 @@ int main()
         }
         
         else {
-            originP = current_autoPos[3];
+            originA = autoAPos[3];// *globalreverserotmat;
+            originR = autoRPos[3] *globalreverserotmat;
+            originL = autoLPos[3] *globalreverserotmat;
             origincP = glm::vec3(glm::vec4(current_cPos, 1.0f)* globalreverserotmat);
         }
+
+        vector<glm::mat4> autoPositions{autoLPos,autoAPos,autoRPos};
+
         currentAnimC++;
-        cout << spur<<"\n";
-        glm::mat4 model = current_autoPos;
+        //cout << spur<<"\n";
+        glm::mat4 model = autoPositions[spur];
         //model = glm::rotate(model, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
         //model = glm::rotate(model, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
         //model = glm::rotate(model, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
