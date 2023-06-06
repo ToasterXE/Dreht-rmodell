@@ -2,4 +2,5 @@
 C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(76,15): warning C4244: "Argument": Konvertierung von "time_t" in "unsigned int", möglicher Datenverlust
 C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(94,25): warning C4305: "Initialisierung": Verkürzung von "double" in "float"
 C:\Users\mrnon\source\repos\Drehtürmodell\main.cpp(181,15): warning C4101: "current_lookat": Unreferenzierte lokale Variable
+LINK : warning LNK4098: Standardbibliothek "MSVCRT" steht in Konflikt mit anderen Bibliotheken; /NODEFAULTLIB:Bibliothek verwenden.
   Drehtürmodell.vcxproj -> C:\Users\mrnon\source\repos\Drehtürmodell\x64\Debug\Drehtürmodell.exe
