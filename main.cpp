@@ -83,7 +83,7 @@ int main()
     Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg1.obj"));
     Model model2(glm::vec3(0.0f, -17.1f, 0.0f), glm::vec3(59.621f, 0.0f, 2.01f), ("dateien/wege/animation/weg2anim.txt"), ("dateien/wege/weg2.obj"));
     Model model4(glm::vec3(0.0f, 17.1f, 0.0f), glm::vec3(59.621f, 0.0f, -2.01f), ("dateien/wege/animation/weg4anim.txt"), ("dateien/wege/weg4.obj"));
-    //Model model3(glm::vec3(0.0f, 0.0f, 23.3f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
+    Model model3(glm::vec3(0.0f, 0.0f, 23.3f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
     vector<Model> modelvec{ model1, model2, model4,/*, model4, model5 */ };
@@ -96,7 +96,7 @@ int main()
 
 
     vector<glm::mat4>currentmatrices{m1,m2,m3,m4,m5};   //muss mind so vielwie len.currentwege haben
-    vector<Model> currentwege{model0, model4, model4, model4,/* model4*/};
+    vector<Model> currentwege{model0, model1, model1, model4,/* model4*/};
 
     int wegeTime = 5;
     float animTime = 0.1;
@@ -210,8 +210,6 @@ int main()
         glm::mat4 globalreverserotmat(1.0f);
 
 
-
-        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA);
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
         processInput(window);
@@ -220,49 +218,7 @@ int main()
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //--würfel--
-        würfelshader.use();
-        würfelshader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        würfelshader.setVec3("lightPos", lightPos);
-        würfelshader.setVec3("viewPos", camera.Position);
-        würfelshader.setMat4("projection", projection);
-        würfelshader.setMat4("view", view);
-
-        glm::vec4 transcoords = glm::vec4((currentwege[1].newPos.x, currentwege[1].newPos.y, currentwege[1].newPos.z, 1.0f));
-        glm::mat4 transmate = globalrotmat;
-        transmate = glm::translate(globalrotmat, currentwege[1].newPos);
-        glm::vec4 transecoords = transmate * transcoords;   //??
-
-
-        for (int i = 0; i < würfeldaten.size(); i++) {
-
-            würfelshader.setVec3("objectColor", würfeldaten[i].color);
-
-            glm::mat4 würfelmodel = glm::mat4(1.0f);
-            würfelmodel = glm::translate(würfelmodel, würfeldaten[i].pos);
-            würfelmodel = glm::scale(würfelmodel, glm::vec3(würfeldaten[i].scale));
-            würfelmodel = glm::rotate(würfelmodel, glm::radians(float(glfwGetTime() * würfeldaten[i].rotSpeed)), glm::vec3(1.0f, 1.0f, 1.0f));
-            würfelshader.setMat4("model", würfelmodel);
-
-            glBindVertexArray(cubeVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        }
-
-        //--lichtwürfel--
-        lichtshader.use();
-        lichtshader.setMat4("projection", projection);
-        lichtshader.setMat4("view", view);
-
-        glm::mat4 lichtmodel(1.0f);
-        lichtmodel = glm::mat4(1.0f);
-        lichtmodel = glm::translate(lichtmodel, lightPos);
-        lichtmodel = glm::scale(lichtmodel, glm::vec3(2.2f));
-        lichtmodel = glm::rotate(lichtmodel, glm::radians(float(glfwGetTime() * 100)), glm::vec3(1.0f,1.0f,1.0f));
-        lichtshader.setMat4("model", lichtmodel);
-
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+       
 
 
         //--model--
@@ -276,7 +232,6 @@ int main()
         modelShader.setFloat("material.shininess", 16.0f);
 
         modelShader.setMat4("projection", projection);
-        modelShader.setMat4("view", view);
         modelShader.setVec3("viewPos", camera.Position);
 
 
@@ -290,13 +245,7 @@ int main()
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
         }
 
-        for (int i = 1; i < currentwege.size(); i++) {
-            Model testmodel = currentwege[i];
 
-            glm::mat4 model = currentmatrices[i];
-            modelShader.setMat4("model", model);
-            testmodel.Draw(modelShader);
-        }
 
 
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -344,6 +293,24 @@ int main()
         }
         
         else {
+
+            for (int i = 1; i < currentwege.size(); i++) {
+                currentmatrices[i] = glm::mat4(1.0f);
+                currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+                for (int e = i; e > 0; e--) {
+
+                    currentmatrices[i] = glm::translate(currentmatrices[i], currentwege[i - e].newPos);
+                    currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                    currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                    currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+                }
+
+            }
+
             originA = autoAPos[3] *globalreverserotmat;// *globalreverserotmat;
             originR = autoRPos[3] *globalreverserotmat;
             originL = autoLPos[3] *globalreverserotmat;
@@ -379,25 +346,15 @@ int main()
             origincP += glm::vec3(dist_rotate_c);
             current_cPos = origincP;
 
-           for (int i = 1; i < currentwege.size(); i++) {
-                currentmatrices[i] = glm::mat4(1.0f);
-                currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-                currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-                currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-                for (int e = i; e > 0; e--) {
-
-                    currentmatrices[i] = glm::translate(currentmatrices[i], currentwege[i - e].newPos);
-                    currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-                    currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-                    currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-                }
-
-            }
 
            
         }
+
+        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA);
+
+
+
 
         vector<glm::mat4> autoPositions{autoLPos,autoAPos,autoRPos};
 
@@ -406,9 +363,62 @@ int main()
         //model = glm::rotate(model, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
         //model = glm::rotate(model, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
         //model = glm::rotate(model, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        modelShader.setMat4("view", view);
 
+        
+        for (int i = 1; i < currentwege.size(); i++) {
+            Model testmodel = currentwege[i];
+
+            glm::mat4 model = currentmatrices[i];
+            modelShader.setMat4("model", model);
+            testmodel.Draw(modelShader);
+        }
         modelShader.setMat4("model", model);
         autoModel.Draw(modelShader);
+
+        //--würfel--
+        würfelshader.use();
+        würfelshader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        würfelshader.setVec3("lightPos", lightPos);
+        würfelshader.setVec3("viewPos", camera.Position);
+        würfelshader.setMat4("projection", projection);
+        würfelshader.setMat4("view", view);
+
+        glm::vec4 transcoords = glm::vec4((currentwege[1].newPos.x, currentwege[1].newPos.y, currentwege[1].newPos.z, 1.0f));
+        glm::mat4 transmate = globalrotmat;
+        transmate = glm::translate(globalrotmat, currentwege[1].newPos);
+        glm::vec4 transecoords = transmate * transcoords;   //??
+
+
+        for (int i = 0; i < würfeldaten.size(); i++) {
+
+            würfelshader.setVec3("objectColor", würfeldaten[i].color);
+
+            glm::mat4 würfelmodel = glm::mat4(1.0f);
+            würfelmodel = glm::translate(würfelmodel, würfeldaten[i].pos);
+            würfelmodel = glm::scale(würfelmodel, glm::vec3(würfeldaten[i].scale));
+            würfelmodel = glm::rotate(würfelmodel, glm::radians(float(glfwGetTime() * würfeldaten[i].rotSpeed)), glm::vec3(1.0f, 1.0f, 1.0f));
+            würfelshader.setMat4("model", würfelmodel);
+
+            glBindVertexArray(cubeVAO);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        }
+
+        //--lichtwürfel--
+        lichtshader.use();
+        lichtshader.setMat4("projection", projection);
+        lichtshader.setMat4("view", view);
+
+        glm::mat4 lichtmodel(1.0f);
+        lichtmodel = glm::mat4(1.0f);
+        lichtmodel = glm::translate(lichtmodel, lightPos);
+        lichtmodel = glm::scale(lichtmodel, glm::vec3(2.2f));
+        lichtmodel = glm::rotate(lichtmodel, glm::radians(float(glfwGetTime() * 100)), glm::vec3(1.0f, 1.0f, 1.0f));
+        lichtshader.setMat4("model", lichtmodel);
+
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
