@@ -34,6 +34,7 @@ public:
     vector<glm::mat4> aMatrices;
     vector<glm::mat4> rMatrices;
     vector<glm::mat4> lMatrices;
+    vector<glm::mat4> uMatrices;
     vector<glm::vec3> aCposi;
     vector<vector<glm::mat4>> matrices;
     // constructor, expects a filepath to a 3D model.
@@ -107,6 +108,17 @@ private:
                 }
             }
             lMatrices.push_back(newMat);
+        }
+
+        for (int i = 0; i <len/16;i++){
+            glm::mat4 newMat;
+            for (int zeile = 0; zeile < 4; zeile++){
+                for (int spalte = 0; spalte < 4; spalte++){
+                    datei>>z;
+                    newMat[spalte][zeile] = (float)z;   //muss umgedreht sein wegen sachen
+                }
+            }
+            uMatrices.push_back(newMat);
         }
         matrices = {lMatrices,aMatrices,rMatrices};
         /*for (int e = 0; e <aMatrices.size(); e++){

@@ -349,7 +349,37 @@ int main()
             originL = autoLPos[3] *globalreverserotmat;
             origincP = glm::vec3(glm::vec4(current_cPos, 1.0f) * globalreverserotmat);
 
-            for (int i = 1; i < currentwege.size(); i++) {
+            glm::vec4 newP = autoAPos[3];
+            glm::vec4 oldP = currentwege[1].aMatrices[currentAnimC][3];
+            glm::vec4 dist = newP - oldP;
+            glm::vec4 dist_rotate = dist * globalreverserotmat;
+            originA += dist_rotate;
+            autoAPos[3] = originA;
+
+            oldP = currentwege[1].lMatrices[currentAnimC][3];
+            newP = autoLPos[3];
+            dist = newP - oldP;
+            dist_rotate = dist * globalreverserotmat;
+            originL += dist_rotate;
+            autoLPos[3] = originL;
+
+
+            oldP = currentwege[1].rMatrices[currentAnimC][3];
+            newP = autoRPos[3];
+            dist = newP - oldP;
+            dist_rotate = dist * globalreverserotmat;
+            originR += dist_rotate;
+            autoRPos[3] = originR;
+
+            glm::vec3 newcP = current_cPos;
+            glm::vec3 oldcP = currentwege[1].aCposi[currentAnimC];
+            glm::vec3 dist_c = newcP - oldcP;
+            glm::vec4 dist_rotate_c = glm::vec4(dist_c, 1.0f) * globalreverserotmat;
+
+            origincP += glm::vec3(dist_rotate_c);
+            current_cPos = origincP;
+
+           for (int i = 1; i < currentwege.size(); i++) {
                 currentmatrices[i] = glm::mat4(1.0f);
                 currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
                 currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));

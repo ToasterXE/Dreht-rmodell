@@ -3,6 +3,7 @@
 #ccube -kamera
 #rcube -rechts
 #lcube -links
+#ucube -up
 
 blender export:
 up: y
