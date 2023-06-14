@@ -23,6 +23,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 //void get_mouse(GLFWwindow* window, double xpos, double ypos);
 void get_scroll(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
+vector<modelData> getwürfel(int num);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -83,7 +84,7 @@ int main()
     Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg1.obj"));
     Model model2(glm::vec3(0.0f, -17.1f, 0.0f), glm::vec3(59.621f, 0.0f, 2.01f), ("dateien/wege/animation/weg2anim.txt"), ("dateien/wege/weg2.obj"));
     Model model4(glm::vec3(0.0f, 17.1f, 0.0f), glm::vec3(59.621f, 0.0f, -2.01f), ("dateien/wege/animation/weg4anim.txt"), ("dateien/wege/weg4.obj"));
-    Model model3(glm::vec3(0.0f, 0.0f, 23.3f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
+    Model model3(glm::vec3(0.0f, 0.0f, 24.5f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
     vector<Model> modelvec{ model1, model2, model4,/*, model4, model5 */ };
@@ -96,7 +97,7 @@ int main()
 
 
     vector<glm::mat4>currentmatrices{m1,m2,m3,m4,m5};   //muss mind so vielwie len.currentwege haben
-    vector<Model> currentwege{model0, model1, model1, model4,/* model4*/};
+    vector<Model> currentwege{model0, model1, model3, model4,/* model4*/};
 
     int wegeTime = 5;
     float animTime = 0.1;
@@ -178,15 +179,8 @@ int main()
     vector<modelData> würfeldaten;
     vector<glm::vec3> positionen;
 
-    for (int c = 0; c < würfelNum; c++) {
-        glm::vec3 color((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX));
-        glm::vec3 pos(camera.Position.x + (float)(rand()%50), (float)(rand()%40-30), camera.Position.z + (float)(rand()%50 + 30));
 
-        modelData modeldata(100.0f, pos, 3.0f, color);
-        würfeldaten.push_back(modeldata);
-    }
-
-    glm::vec3 current_lookat;
+    glm::vec3 current_upV(0.0f,1.0f,0.0f);
     glm::vec3 current_cPos(0.0f,0.0f,0.0f);
     glm::mat4 autoAPos;
     glm::mat4 autoLPos;
@@ -243,9 +237,10 @@ int main()
             globalrot += currentwege[1].rotation;
             currentwege.erase(currentwege.begin() + 1);
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
+            würfeldaten = getwürfel(würfelNum);
         }
 
-
+        globalrot = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -257,8 +252,8 @@ int main()
         autoRPos = currentwege[1].rMatrices[currentAnimC];
 
         current_cPos = currentwege[1].aCposi[currentAnimC];
-
-
+        current_upV = glm::vec3(currentwege[1].uMatrices[currentAnimC][3] - currentwege[1].aMatrices[currentAnimC][3]);
+        //scout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
 
         if (currentAnimC) {
             glm::vec4 newP = autoAPos[3];
@@ -351,8 +346,7 @@ int main()
            
         }
 
-        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA);
-
+        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA, glm::vec3(0.0f,1.0f,0.0f));
 
 
 
@@ -428,6 +422,19 @@ int main()
     return 0;
 }
 float last = 0.0;
+
+vector<modelData> getwürfel(int num) {
+    vector<modelData> datae;
+    for (int c = 0; c < num; c++) {
+        glm::vec3 color((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX));
+        glm::vec3 pos(camera.Position.x + (float)(rand() % 50), (float)(rand() % 40 - 30), camera.Position.z + (float)(rand() % 50 + 30));
+
+        modelData modeldata(100.0f, pos, 3.0f, color);
+        datae.push_back(modeldata);
+    }
+    return datae;
+}
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetTime()>last+0.1) {
