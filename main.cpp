@@ -249,11 +249,15 @@ int main()
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        crotmat = glm::rotate(crotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
+
+        crotmat = glm::rotate(crotmat, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
         crotmat = glm::rotate(crotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        crotmat = glm::rotate(crotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        crotmat = glm::rotate(crotmat, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+
+
+
 
         autoAPos = currentwege[1].aMatrices[currentAnimC];
         autoLPos = currentwege[1].lMatrices[currentAnimC];
