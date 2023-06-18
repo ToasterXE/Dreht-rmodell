@@ -87,7 +87,7 @@ int main()
     Model model3(glm::vec3(0.0f, 0.0f, 24.5f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model2, model3,/*, model4, model5 */ };
+    vector<Model> modelvec{ model2, model2, model3, model4 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -203,8 +203,9 @@ int main()
 
         glm::mat4 globalreverserotmat(1.0f);
 
+        glm::mat4 crotmat(1.0f);
 
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(75.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 
         processInput(window);
 
@@ -247,13 +248,19 @@ int main()
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
+        crotmat = glm::rotate(crotmat, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        crotmat = glm::rotate(crotmat, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        crotmat = glm::rotate(crotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
         autoAPos = currentwege[1].aMatrices[currentAnimC];
         autoLPos = currentwege[1].lMatrices[currentAnimC];
         autoRPos = currentwege[1].rMatrices[currentAnimC];
 
         current_cPos = currentwege[1].aCposi[currentAnimC];
         current_upV = glm::vec3(currentwege[1].uMatrices[currentAnimC][3] - currentwege[1].aMatrices[currentAnimC][3]);
-        //cout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
+        cout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
 
         if (currentAnimC) {
             glm::vec4 newP = autoAPos[3];
@@ -303,13 +310,11 @@ int main()
                     currentmatrices[i] = glm::rotate(currentmatrices[i], glm::radians(currentwege[i - e].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
                 }
-                //currentmatrices[i] = glm::translate(currentmatrices[i], globalpos);
 
             }
 
 
             originA = glm::vec4(glm::vec3(autoAPos[3]) - glm::vec3(0.0f, 0.0f, 0.0f),1.0f) * globalrotmat;// *globalreverserotmat;// *globalreverserotmat;
-            //cout << originA[0] << " " << originA[1] << " " << originA[2] << " " << originA[3] << "    " << autoAPos[3][0] << " " << autoAPos[3][1] << " " << autoAPos[3][2] << " " << autoAPos[3][3] <<"\n";
             originA = autoAPos[3] *globalreverserotmat;
             originR = autoRPos[3] *globalreverserotmat;
             originL = autoLPos[3] *globalreverserotmat;
@@ -340,7 +345,7 @@ int main()
             glm::vec3 newcP = current_cPos;
             glm::vec3 oldcP = currentwege[1].aCposi[currentAnimC];
             glm::vec3 dist_c = newcP - oldcP;
-            glm::vec4 dist_rotate_c = glm::vec4(dist_c, 1.0f) * globalrotmat;
+            glm::vec4 dist_rotate_c = glm::vec4(dist_c, 1.0f) * crotmat;
 
             origincP += glm::vec3(dist_rotate_c);
             current_cPos = origincP;
@@ -349,12 +354,7 @@ int main()
 
            
         }
-        //cout << autoAPos[3][0] << " " << autoAPos[3][1] << " " << autoAPos[3][2] << "\n";
-        //autoAPos[3][1] = 0;
-        //cout << autoAPos[3][0] << " " << autoAPos[3][1] << " " << autoAPos[3][2] << "\n";
-        //autoAPos = glm::translate(autoAPos, globalpos);
-        //originA += globalpos;
-        //cout << originA[0] << " " << originA[1]<<" " << originA[2] << "\n";
+
         glm::mat4 view = camera.GetViewMatrix(current_cPos, originA, current_upV);
         //autoAPos += globalpos;
 
