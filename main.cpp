@@ -253,7 +253,7 @@ int main()
 
         current_cPos = currentwege[1].aCposi[currentAnimC];
         current_upV = glm::vec3(currentwege[1].uMatrices[currentAnimC][3] - currentwege[1].aMatrices[currentAnimC][3]);
-        //scout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
+        cout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
 
         if (currentAnimC) {
             glm::vec4 newP = autoAPos[3];
@@ -346,7 +346,7 @@ int main()
            
         }
 
-        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA, glm::vec3(0.0f,1.0f,0.0f));
+        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA, current_upV);
 
 
 
