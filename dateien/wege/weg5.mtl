@@ -1,4 +1,4 @@
-# Blender 3.3.1 MTL File: 'weg1.blend'
+# Blender 3.3.1 MTL File: 'weg5.blend'
 # www.blender.org
 
 newmtl Material
@@ -9,7 +9,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd wegtextur.jpg
+map_Kd dingtextur.jpg
 
 newmtl Material.001
 Ns 250.000000
@@ -150,16 +150,6 @@ Ni 1.450000
 d 1.000000
 illum 2
 map_Kd wegtextur.jpg
-
-newmtl Material.015
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 2
-map_Kd 20230430_144504.jpg
 
 newmtl Material.016
 Ns 250.000000
@@ -312,6 +302,16 @@ illum 2
 map_Kd dingtextur.jpg
 
 newmtl Material.031
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd dingtextur.jpg
+
+newmtl Material.062
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.500000 0.500000 0.500000

@@ -85,9 +85,10 @@ int main()
     Model model2(glm::vec3(0.0f, -17.1f, 0.0f), glm::vec3(59.621f, 0.0f, 2.01f), ("dateien/wege/animation/weg2anim.txt"), ("dateien/wege/weg2.obj"));
     Model model4(glm::vec3(0.0f, 17.1f, 0.0f), glm::vec3(59.621f, 0.0f, -2.01f), ("dateien/wege/animation/weg4anim.txt"), ("dateien/wege/weg4.obj"));
     Model model3(glm::vec3(0.0f, 0.0f, 24.5f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
+    Model model5(glm::vec3(0.0f, 0.0f, -24.5f), glm::vec3(60.0f, -6.279f, 0.0f), ("dateien/wege/animation/weg5anim.txt"), ("dateien/wege/weg5.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model2, model2, model3, model4 /*model5 */ };
+    vector<Model> modelvec{ model1, model2, model3, model4, model5 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -97,7 +98,7 @@ int main()
 
 
     vector<glm::mat4>currentmatrices{m1,m2,m3,m4,m5};   //muss mind so vielwie len.currentwege haben
-    vector<Model> currentwege{model0, model1, model3, model1,/* model4*/};
+    vector<Model> currentwege{model0, model1, model3, model5/* model4*/};
 
     int wegeTime = 5;
     float animTime = 0.1;
@@ -355,7 +356,7 @@ int main()
            
         }
 
-        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA, current_upV);
+        glm::mat4 view = camera.GetViewMatrix(current_cPos, originA, glm::vec3(0.0f,1.0f,0.0f));
         //autoAPos += globalpos;
 
 
