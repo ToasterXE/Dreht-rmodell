@@ -19,4 +19,21 @@ class modelData{
     }
 };
 
+class Donut{
+    public:
+    glm::vec3 startpos;
+    glm::vec3 fallrichtung;
+    int spur;
+    int startframe;
+    glm::vec3 currentposition;
+    Donut(glm::vec3 startposition, glm::vec3 fallrichtunge, int spure, int startframee){ //spur 0 = links
+        startpos = startposition;
+        fallrichtung = fallrichtunge;
+        spur = spure;
+        startframe = startframee;
+    }
+};
+
+
+
 #endif

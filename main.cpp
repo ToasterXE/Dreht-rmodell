@@ -23,7 +23,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 //void get_mouse(GLFWwindow* window, double xpos, double ypos);
 void get_scroll(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
-vector<modelData> getwürfel(int num);
+vector<modelData> getwürfel(int num, glm::vec4 pos);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -80,6 +80,7 @@ int main()
     glm::vec3 insgesamtrot = glm::vec3(0.0f, 0.0f, 0.0f);
     std::cout<<"lade modelle\n";
     Model autoModel(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"), ("dateien/wege/auto.obj"));
+    Model donut(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"), ("dateien/wege/donut.obj"));
     Model model0(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), ("keinpfad"), ("keinpfad"));
     Model model1(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg1.obj"));
     Model model2(glm::vec3(0.0f, -17.1f, 0.0f), glm::vec3(59.621f, 0.0f, 2.01f), ("dateien/wege/animation/weg2anim.txt"), ("dateien/wege/weg2.obj"));
@@ -88,7 +89,7 @@ int main()
     Model model5(glm::vec3(0.0f, 0.0f, -24.5f), glm::vec3(60.0f, -6.279f, 0.0f), ("dateien/wege/animation/weg5anim.txt"), ("dateien/wege/weg5.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model2, model3, model4, model5 /*model5 */ };
+    vector<Model> modelvec{ model1, model2, model1, model4, model1 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -98,7 +99,12 @@ int main()
 
 
     vector<glm::mat4>currentmatrices{m1,m2,m3,m4,m5};   //muss mind so vielwie len.currentwege haben
-    vector<Model> currentwege{model0, model1, model3, model5/* model4*/};
+    vector<Model> currentwege{model0, model1, model1, model1/* model4*/};
+    vector<Donut> donuts;
+    Donut defaultdonut(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), 4,0);
+    for (int i = 0; i < 100; i++) {
+        donuts.push_back(defaultdonut);
+    }
 
     int wegeTime = 5;
     float animTime = 0.1;
@@ -176,8 +182,8 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     
-    int würfelNum = 20;
-    vector<modelData> würfeldaten;
+    int würfelNum = 1;
+    vector<vector<modelData>> würfeldaten;
     vector<glm::vec3> positionen;
 
 
@@ -190,6 +196,11 @@ int main()
     glm::vec4 originL(0.0f, 0.0f, 0.0f, 1.0f);
     glm::vec4 originR(0.0f, 0.0f, 0.0f, 1.0f);
     glm::vec3 origincP(1.0f, 1.0f, 1.0f);
+    int score = 0;
+    int num = 0;
+    for (int i = 1; i < currentwege.size(); i++) {
+        würfeldaten.push_back(getwürfel(würfelNum, currentmatrices[i][3]));
+    }
 
     while (!glfwWindowShouldClose(window))
     {
@@ -239,10 +250,15 @@ int main()
             globalrot += currentwege[1].rotation;
             currentwege.erase(currentwege.begin() + 1);
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
-            würfeldaten = getwürfel(würfelNum);
+            for (int i = 1; i < currentwege.size(); i++) {
+                würfeldaten[i-1] = getwürfel(würfelNum, currentmatrices[i][3]);
+            }
         }
 
         // globalrot = glm::vec3(0.0f, 0.0f, 0.0f);
+
+
+
 
 
         globalreverserotmat = glm::rotate(globalreverserotmat, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -265,7 +281,7 @@ int main()
 
         current_cPos = currentwege[1].aCposi[currentAnimC];
         current_upV = glm::vec3(currentwege[1].uMatrices[currentAnimC][3] - currentwege[1].aMatrices[currentAnimC][3]);
-        cout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
+       // cout << current_upV[0]<<" "<<current_upV[1]<<" "<<current_upV[2] << "\n";
 
         if (currentAnimC) {
             glm::vec4 newP = autoAPos[3];
@@ -366,6 +382,45 @@ int main()
 
         vector<glm::mat4> autoPositions{autoLPos,autoAPos,autoRPos};
 
+        for (int i = 0; i < 100; i++) {
+            if (donuts[i].spur < 4) {
+                if (donuts[i].startframe == currentAnimC) {
+                    if (donuts[i].spur == spur) {
+                        score++;
+                        donuts[i] = defaultdonut;
+                    }
+                    else {
+                        donuts[i] = defaultdonut;
+                    }
+                }
+                else {
+                    if (currentAnimC > donuts[i].startframe) {
+                        num = 100 - (currentAnimC - donuts[i].startframe);
+                    }
+                    else {
+                        num = currentAnimC - donuts[i].startframe;
+                    }
+                    num = 100 - num;
+                    //out << num << "nu\n";
+
+                    cout << score << "\n";
+                    donuts[i].currentposition = glm::vec3(donuts[i].startpos + (donuts[i].fallrichtung * glm::vec3(num, num, num)));
+                    //cout << donuts[i].startpos[0] << " " << donuts[i].fallrichtung[0] * num << "\n";
+                    glm::mat4 emodel(1.0f);
+                    emodel = glm::translate(emodel, donuts[i].currentposition);
+                    emodel = glm::scale(emodel, glm::vec3(10.0f, 10.0f, 10.0f));
+                    //cout << emodel[3][0] << " " << emodel[3][1] << " " << emodel[3][2] << " \n";
+                    modelShader.setMat4("model", emodel);
+                    donut.Draw(modelShader);
+                }
+            }
+        }
+
+        //donut
+        if (rand() % 20 == 1) {
+            glm::vec3 posi = glm::vec3(currentwege[2].aMatrices[currentAnimC][3] + ((currentwege[2].uMatrices[currentAnimC][3] - currentwege[2].aMatrices[currentAnimC][3]) * glm::vec4(10.0f, 10.0f, 10.0f, 10.0f)));
+            donuts[currentAnimC] = Donut(posi, glm::vec3((currentwege[2].aMatrices[currentAnimC][3] - currentwege[2].uMatrices[currentAnimC][3])/glm::vec4(10.0f,10.0f,10.0f,10.0f)), rand() % 3, currentAnimC);
+        }
         currentAnimC++;
         glm::mat4 model = autoPositions[spur];
         //model = glm::rotate(model, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -397,20 +452,22 @@ int main()
         transmate = glm::translate(globalrotmat, currentwege[1].newPos);
         glm::vec4 transecoords = transmate * transcoords;   //??
 
+        for (int e = 0; e < würfeldaten.size(); e++) {
+            vector<modelData> cdatern = würfeldaten[e];
+            for (int i = 0; i < cdatern.size(); i++) {
 
-        for (int i = 0; i < würfeldaten.size(); i++) {
+                würfelshader.setVec3("objectColor", cdatern[i].color);
 
-            würfelshader.setVec3("objectColor", würfeldaten[i].color);
+                glm::mat4 würfelmodel = glm::mat4(1.0f);
+                würfelmodel = glm::translate(würfelmodel, cdatern[i].pos);
+                würfelmodel = glm::scale(würfelmodel, glm::vec3(cdatern[i].scale));
+                würfelmodel = glm::rotate(würfelmodel, glm::radians(float(glfwGetTime() * cdatern[i].rotSpeed)), glm::vec3(1.0f, 1.0f, 1.0f));
+                würfelshader.setMat4("model", würfelmodel);
 
-            glm::mat4 würfelmodel = glm::mat4(1.0f);
-            würfelmodel = glm::translate(würfelmodel, würfeldaten[i].pos);
-            würfelmodel = glm::scale(würfelmodel, glm::vec3(würfeldaten[i].scale));
-            würfelmodel = glm::rotate(würfelmodel, glm::radians(float(glfwGetTime() * würfeldaten[i].rotSpeed)), glm::vec3(1.0f, 1.0f, 1.0f));
-            würfelshader.setMat4("model", würfelmodel);
+                glBindVertexArray(cubeVAO);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            glBindVertexArray(cubeVAO);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-
+            }
         }
 
         //--lichtwürfel--
@@ -437,13 +494,12 @@ int main()
 }
 float last = 0.0;
 
-vector<modelData> getwürfel(int num) {
+vector<modelData> getwürfel(int num,glm::vec4 pos) {
     vector<modelData> datae;
     for (int c = 0; c < num; c++) {
         glm::vec3 color((float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX), (float)(rand()) / (float)(RAND_MAX));
-        glm::vec3 pos(camera.Position.x + (float)(rand() % 50), (float)(rand() % 40 - 30), camera.Position.z + (float)(rand() % 50 + 30));
-
-        modelData modeldata(100.0f, pos, 3.0f, color);
+        glm::vec3 pos_e(pos.x + (float)(rand() % 50), (float)(rand() % 40 - 30), pos.z + (float)(rand() % 50 + 30));
+        modelData modeldata(100.0f, pos_e, 3.0f, color);
         datae.push_back(modeldata);
     }
     return datae;
