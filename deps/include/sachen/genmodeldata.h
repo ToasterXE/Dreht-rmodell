@@ -25,9 +25,12 @@ class Donut{
     glm::vec3 fallrichtung;
     int spur;
     int startframe;
+    glm::vec3 destpos;
     glm::vec3 currentposition;
-    Donut(glm::vec3 startposition, glm::vec3 fallrichtunge, int spure, int startframee){ //spur 0 = links
+    Donut(glm::vec3 startposition, glm::vec3 destpose, glm::vec3 fallrichtunge, int spure, int startframee){ //spur 0 = links
         startpos = startposition;
+        currentposition = startposition;
+        destpos = destpose;
         fallrichtung = fallrichtunge;
         spur = spure;
         startframe = startframee;
