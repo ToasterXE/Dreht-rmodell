@@ -93,7 +93,7 @@ int main()
     Model model5(glm::vec3(0.0f, 0.0f, -24.5f), glm::vec3(60.0f, -6.279f, 0.0f), ("dateien/wege/animation/weg5anim.txt"), ("dateien/wege/weg5.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model1, model1, model1, model1 /*model5 */ };
+    vector<Model> modelvec{ model1, model2, model2, model1, model1 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -415,9 +415,16 @@ int main()
                         donuts[i].currentposition += glm::vec3((donuts[i].destpos - donuts[i].startpos) / glm::vec3(100.0f, 100.0f, 100.0f) * glm::vec3(num, num, num));
 
                         donuts[i].currentposition += currentwege[1].newPos;
+                        glm::vec3 rotv = globalrot;
+                        rotv += currentwege[1].rotation;
+                        cout << rotv[0] << " " << rotv[1] << " " << rotv[2] << "\n";
+                        glm::mat4 rot(1.0f);
+                        rot = glm::rotate(rot, glm::radians(-rotv.z), glm::vec3(0.0f, 0.0f, 1.0f));
+                        rot = glm::rotate(rot, glm::radians(-rotv.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                        rot = glm::rotate(rot, glm::radians(-rotv.x), glm::vec3(1.0f, 0.0f, 0.0f));
                      
 
-                        donuts[i].currentposition = glm::vec3(glm::vec4(donuts[i].currentposition, 1.0f) * globalreverserotmat);
+                        donuts[i].currentposition = glm::vec3(glm::vec4(donuts[i].currentposition, 1.0f) * rot);
                         emodel = glm::translate(emodel, donuts[i].currentposition);
 
                     }
@@ -429,14 +436,14 @@ int main()
                         donuts[i].currentposition = glm::vec3(glm::vec4(donuts[i].currentposition, 1.0f) * globalreverserotmat);
                         emodel = glm::translate(emodel, donuts[i].currentposition);
                     }
-                    cout << num << "\n";
+                    //cout << num << "\n";
                     //num = 100 - num;
                     //out << num << "nu\n";
 
                     //cout << score << "\n";
-                    emodel = glm::scale(emodel, glm::vec3(10.0f, 10.0f, 10.0f));
+                    emodel = glm::scale(emodel, glm::vec3(20.0f, 20.0f, 20.0f));
 
-                    //cout << emodel[3][0] << " " << emodel[3][1] << " " << emodel[3][2] << " e"<< i << " \n";
+                   // cout << emodel[3][0] << " " << emodel[3][1] << " " << emodel[3][2] << " e"<< i << " \n";
                     donutShader.setMat4("model", emodel);
                     donut.Draw(donutShader);
                 }
