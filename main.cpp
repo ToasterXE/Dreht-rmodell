@@ -93,7 +93,7 @@ int main()
     Model model5(glm::vec3(0.0f, 0.0f, -24.5f), glm::vec3(60.0f, -6.279f, 0.0f), ("dateien/wege/animation/weg5anim.txt"), ("dateien/wege/weg5.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model2, model2, model1, model1 /*model5 */ };
+    vector<Model> modelvec{ model1, model2, model4, model1, model1 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -186,8 +186,9 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     
-    int würfelNum = 5;
+    int würfelNum = 20;
     vector<vector<modelData>> würfeldaten;
+    vector<vector<modelData>> würfeldaten2;
     vector<glm::vec3> positionen;
 
 
@@ -204,6 +205,7 @@ int main()
     int num = 0;
     for (int i = 1; i < currentwege.size(); i++) {
         würfeldaten.push_back(getwürfel(würfelNum, currentmatrices[i][3],glm::vec3(0.0f,0.0f,4.0f), glm::vec3(0.0f,1.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f)));
+        würfeldaten2.push_back(getwürfel(würfelNum, currentmatrices[i][3], -glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
     }
 
     while (!glfwWindowShouldClose(window))
@@ -255,7 +257,7 @@ int main()
             globalrot += currentwege[1].rotation;
             currentwege.erase(currentwege.begin() + 1);
             currentwege.push_back(modelvec[rand() % size(modelvec)]);
-  
+            
         }
 
         // globalrot = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -338,7 +340,7 @@ int main()
             }
             for (int i = 1; i < currentwege.size(); i++) {
                 würfeldaten.erase(würfeldaten.begin() + 1);
-
+                würfeldaten2.erase(würfeldaten2.begin() + 1);
                 glm::vec3 Crightvec = glm::vec3(glm::vec4(0.0f, 0.0f, 3.0f, 1.0f) * globalreverserotmat);
                 glm::vec3 Cupvec = glm::vec3(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) * globalreverserotmat);
                 glm::vec3 Cfrontvec = glm::vec3(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) * globalreverserotmat);
@@ -346,6 +348,7 @@ int main()
                 cout << Crightvec[0] << " " << Crightvec[1] << " " << Crightvec[2] << " \n";
                 cout << Cfrontvec[0] << " " << Cfrontvec[1] << " " << Cfrontvec[2] << " f\n";
                 würfeldaten.push_back(getwürfel(würfelNum, currentmatrices[i][3], Crightvec, Cupvec, Cfrontvec));
+                würfeldaten2.push_back(getwürfel(würfelNum, currentmatrices[i][3], -Crightvec, Cupvec, Cfrontvec));
             }
 
 
@@ -527,6 +530,23 @@ int main()
 
             }
         }
+        for (int e = 0; e < würfeldaten2.size(); e++) {
+            vector<modelData> cdatern = würfeldaten2[e];
+            for (int i = 0; i < cdatern.size(); i++) {
+
+                würfelshader.setVec3("objectColor", cdatern[i].color);
+
+                glm::mat4 würfelmodel = glm::mat4(1.0f);
+                würfelmodel = glm::translate(würfelmodel, cdatern[i].pos);
+                würfelmodel = glm::scale(würfelmodel, glm::vec3(cdatern[i].scale));
+                würfelmodel = glm::rotate(würfelmodel, glm::radians(float(glfwGetTime() * cdatern[i].rotSpeed)), glm::vec3(1.0f, 1.0f, 1.0f));
+                würfelshader.setMat4("model", würfelmodel);
+
+                glBindVertexArray(cubeVAO);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            }
+        }
 
         //--lichtwürfel--
         lichtshader.use();
@@ -559,7 +579,7 @@ vector<modelData> getwürfel(int num,glm::vec4 wegpos, glm::vec3 rightvec, glm::v
         glm::vec3 pos_e(wegpos);
         pos_e += rightvec * glm::vec3(8.0f);
         pos_e += upvec * glm::vec3( (float)( rand() % 20 - 10));
-        pos_e += frontvec * glm::vec3((float)(rand() % 20));
+        pos_e += frontvec * glm::vec3((float)(rand() % 40));
         pos_e += rightvec * glm::vec3((float)(rand() % 20));
         //pos_e = glm::vec3(glm::vec4(pos_e, 1.0f) * rot);
         modelData modeldata(100.0f, pos_e, 3.0f, color);
