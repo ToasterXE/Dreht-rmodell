@@ -93,7 +93,7 @@ int main()
     Model model5(glm::vec3(0.0f, 0.0f, -24.5f), glm::vec3(60.0f, -6.279f, 0.0f), ("dateien/wege/animation/weg5anim.txt"), ("dateien/wege/weg5.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model1, model1, model1, model1 /*model5 */ };
+    vector<Model> modelvec{ model1, model2, model4, model3, model5 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -356,9 +356,9 @@ int main()
 
                 if (i == würfeldaten.size()+1) {
 
-                    glm::vec3 Crightvec = (glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)));// *rotationmatrix));
-                    glm::vec3 Cupvec = (glm::vec3(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)));// *rotationmatrix));
-                    glm::vec3 Cfrontvec = (glm::vec3(glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f)));// *rotationmatrix));
+                    glm::vec3 Crightvec = (glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f) * globalreverserotmat));// *rotationmatrix));
+                    glm::vec3 Cupvec = (glm::vec3(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) * globalreverserotmat));// *rotationmatrix));
+                    glm::vec3 Cfrontvec = (glm::vec3(glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f)* globalreverserotmat));// *rotationmatrix));
                     
                     würfeldaten.push_back(getwürfel(würfelNum, currentmatrices[i][3], Crightvec * glm::vec3(3.0f), Cupvec, Cfrontvec));
                     würfeldaten2.push_back(getwürfel(würfelNum, currentmatrices[i][3], -Crightvec * glm::vec3(3.0f), Cupvec, Cfrontvec));
