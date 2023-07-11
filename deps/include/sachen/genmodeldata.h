@@ -11,8 +11,10 @@ class modelData{
     glm::vec3 pos;
     float scale;
     glm::vec3 color;
-    modelData(float rotationSpeed, glm::vec3 position, float scalexyz, glm::vec3 colorval){
+    glm::vec3 e;
+    modelData(glm::vec3 originalposition, float rotationSpeed, glm::vec3 position, float scalexyz, glm::vec3 colorval){
         rotSpeed = rotationSpeed;
+        e = originalposition;
         pos = position;
         scale = scalexyz;
         color = colorval;
