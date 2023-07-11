@@ -41,7 +41,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 glm::vec3 lightPos(15.2f, 8.0f, 25.0f);
 int spur = 1;
-
+int insgesamtdonuts = 0;
 
 int main()
 {
@@ -91,6 +91,7 @@ int main()
     Model model4(glm::vec3(0.0f, 17.1f, 0.0f), glm::vec3(59.621f, 0.0f, -2.01f), ("dateien/wege/animation/weg4anim.txt"), ("dateien/wege/weg4.obj"));
     Model model3(glm::vec3(0.0f, 0.0f, 24.5f), glm::vec3(60.0f, 6.279f, 0.0f), ("dateien/wege/animation/weg3anim.txt"), ("dateien/wege/weg3.obj"));
     Model model5(glm::vec3(0.0f, 0.0f, -24.5f), glm::vec3(60.0f, -6.279f, 0.0f), ("dateien/wege/animation/weg5anim.txt"), ("dateien/wege/weg5.obj"));
+    Model model8(glm::vec3(19.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg8anim.txt"), ("dateien/wege/weg8.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
     vector<Model> modelvec{ model1, model2, model4, model3, model5 /*model5 */ };
@@ -103,7 +104,7 @@ int main()
 
 
     vector<glm::mat4>currentmatrices{m1,m2,m3,m4,m5};   //muss mind so vielwie len.currentwege haben
-    vector<Model> currentwege{model0, model1, model1, model1,/* model4*/};
+    vector<Model> currentwege{model0, model1, model8, model1,/* model4*/};
     vector<Donut> donuts;
     Donut defaultdonut(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f, 0.0f, 0.0f), 4, 0);
     for (int i = 0; i < 100; i++) {
@@ -443,6 +444,7 @@ int main()
         for (int i = 0; i < 100; i++) {
             if (donuts[i].spur < 4) {
                 if (donuts[i].startframe == currentAnimC) {
+                    insgesamtdonuts++;
                     if (donuts[i].spur == spur) {
                         score++;
                         donuts[i] = defaultdonut;
@@ -450,6 +452,8 @@ int main()
                     else {
                         donuts[i] = defaultdonut;
                     }
+                    cout << "Donuts gesammelt: " << score << "   Donuts verloren: " << insgesamtdonuts - score << "    Gewinnrate: "<<(float)score/insgesamtdonuts<<"\n";
+
                 }
                 else {
                     glm::mat4 emodel(1.0f);
@@ -513,7 +517,7 @@ int main()
         modelShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         //donut gen
-        if (rand() % 40 == 1) {
+        if (rand() % 60 == 1) {
             int dspur = rand() % 3;
 
             vector<glm::mat4> base = currentwege[2].matrices[dspur];
@@ -529,11 +533,13 @@ int main()
         }
         currentAnimC++;
         glm::mat4 model = autoPositions[spur];
-        //model = glm::rotate(model, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        //model = glm::rotate(model, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        //model = glm::rotate(model, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
-        modelShader.setMat4("view", view);
+        model = glm::rotate(model, glm::radians(-globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, glm::radians(-globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(-globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
+        modelShader.setMat4("view", view);
+        modelShader.setMat4("model", model);
+        autoModel.Draw(modelShader);
         
         for (int i = 1; i < currentwege.size(); i++) {
             Model testmodel = currentwege[i];
@@ -542,8 +548,7 @@ int main()
             modelShader.setMat4("model", model);
             testmodel.Draw(modelShader);
         }
-        modelShader.setMat4("model", model);
-        autoModel.Draw(modelShader);
+
 
         //--würfel--
         würfelshader.use();
