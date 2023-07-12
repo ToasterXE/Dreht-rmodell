@@ -28,8 +28,8 @@ void processInput(GLFWwindow* window);
 vector<modelData> getwürfel(int num, glm::vec4 wegpos, glm::vec3 rightvec, glm::vec3 upvec, glm::vec3 frontvec);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1200;
 
 Camera camera(glm::vec3(0.0f, 10.0f, 0.0f));
 float lastX = SCR_WIDTH / 2.0f;
@@ -95,7 +95,7 @@ int main()
     Model model9(glm::vec3(-33.0f, 0.0f, 0.0f), glm::vec3(60.0f, 0.0f, 0.0f), ("dateien/wege/animation/weg9anim.txt"), ("dateien/wege/weg9.obj"));
     //Model model4(glm::vec3(0.0f, 28.1f, 0.0f), glm::vec3(60.0f, 0.0f, -7.1f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg4.obj"));
     //Model model5(glm::vec3(0.0f, 00.0f, 26.3f), glm::vec3(60.0f, 1.7329f, 0.0f), ("dateien/wege/animation/weg1anim.txt"), ("dateien/wege/weg5.obj"));
-    vector<Model> modelvec{ model1, model2, model4, model3, model5, model8 /*model5 */ };
+    vector<Model> modelvec{ model1, model2, model4, model3, model5, model8, model9 /*model5 */ };
 
     glm::mat4 m1(1.0f);
     glm::mat4 m2(1.0f);
@@ -105,7 +105,7 @@ int main()
 
 
     vector<glm::mat4>currentmatrices{m1,m2,m3,m4,m5};   //muss mind so vielwie len.currentwege haben
-    vector<Model> currentwege{model0, model1, model9, model1,/* model4*/};
+    vector<Model> currentwege{model0, model1, model1, model1,/* model4*/};
     vector<Donut> donuts;
     Donut defaultdonut(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f, 0.0f, 0.0f), 4, 0);
     for (int i = 0; i < 100; i++) {
@@ -483,12 +483,12 @@ int main()
 
                         emodel = glm::scale(emodel, glm::vec3(20.0f, 20.0f, 20.0f));
                         
-                        glm::vec3 modelrot = globalrot;// +currentwege[1].rotation;
-                        emodel = glm::rotate(emodel, glm::radians(modelrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                        glm::vec3 modelrot = globalrot +currentwege[1].rotation;
+                      /*  emodel = glm::rotate(emodel, glm::radians(modelrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
                         emodel = glm::rotate(emodel, glm::radians(modelrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
                         emodel = glm::rotate(emodel, glm::radians(modelrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
-                    
+                    */
                     }
                     else {
                         num = 100 - (donuts[i].startframe - currentAnimC);
@@ -498,17 +498,17 @@ int main()
                         donuts[i].currentposition = glm::vec3(glm::vec4(donuts[i].currentposition, 1.0f) * globalreverserotmat);
                         emodel = glm::translate(emodel, donuts[i].currentposition);
                         emodel = glm::scale(emodel, glm::vec3(20.0f, 20.0f, 20.0f));
-                        emodel = glm::rotate(emodel, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                        /*emodel = glm::rotate(emodel, glm::radians(globalrot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
                         emodel = glm::rotate(emodel, glm::radians(globalrot.y), glm::vec3(0.0f, 1.0f, 0.0f));
                         emodel = glm::rotate(emodel, glm::radians(globalrot.z), glm::vec3(0.0f, 0.0f, 1.0f));
-                    
+                    */
                     }
-                    /*emodel = glm::rotate(emodel, glm::radians(donuts[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+                    emodel = glm::rotate(emodel, glm::radians(donuts[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
                     emodel = glm::rotate(emodel, glm::radians(donuts[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
                     emodel = glm::rotate(emodel, glm::radians(donuts[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-                    */
+                    
                     //cout << num << "\n";
                     //num = 100 - num;
                     //out << num << "nu\n";
@@ -539,7 +539,7 @@ int main()
             vector<glm::mat4> base = currentwege[2].matrices[dspur];
             glm::vec3 basepos = glm::vec3(base[currentAnimC][3]);
 
-            glm::vec3 abstand = glm::vec3(glm::normalize(currentwege[2].uMatrices[currentAnimC][3] - currentwege[2].aMatrices[currentAnimC][3]) * glm::vec4(10.0f, 10.0f, 10.0f, 1.0f));
+            glm::vec3 abstand = glm::vec3(glm::normalize(currentwege[2].uMatrices[currentAnimC][3] - currentwege[2].aMatrices[currentAnimC][3]) * glm::vec4(20.0f, 20.0f, 20.0f, 1.0f));
             
             //abstand += glm::vec3(0.0f, 0.0f, 0.0f);
 
