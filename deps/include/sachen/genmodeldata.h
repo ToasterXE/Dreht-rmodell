@@ -29,6 +29,7 @@ class Donut{
     int startframe;
     glm::vec3 destpos;
     glm::vec3 currentposition;
+    glm::vec3 rotation;
     Donut(glm::vec3 startposition, glm::vec3 destpose, glm::vec3 fallrichtunge, int spure, int startframee){ //spur 0 = links
         startpos = startposition;
         currentposition = startposition;
@@ -36,6 +37,7 @@ class Donut{
         fallrichtung = fallrichtunge;
         spur = spure;
         startframe = startframee;
+        rotation=glm::vec3(float(rand()%180),float(rand()%180),float(rand()%180));
     }
 };
 
